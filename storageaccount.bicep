@@ -4,6 +4,7 @@ var myContainerName = 'myfirstcontainer'
 var virtualNetworkName = 'myVnet'
 var subnet1Name = 'firstSubnet'
 var privateEndpointName = 'myPrivateEndpoint'
+var pvtEndpointDnsGroupName = '${privateEndpointName}/mydnsgroupname'
 param myPrivateDNS string = 'privatelink.blob.core.windows.net'
 
 resource myPrivateDNSZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
@@ -53,7 +54,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-05-01' = {
     }
   }
 
-  resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
     parent: myPrivateDNSZone
     name: '${myPrivateDNS}-link'
     location: 'global'
@@ -96,3 +97,19 @@ resource myBlobContainer 'Microsoft.Storage/storageAccounts/blobServices/contain
     }
 }
 
+resource pvtEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-05-01' = {
+    name: pvtEndpointDnsGroupName
+    properties: {
+      privateDnsZoneConfigs: [
+        {
+          name: 'config1'
+          properties: {
+            privateDnsZoneId: myPrivateDNSZone.id
+          }
+        }
+      ]
+    }
+    dependsOn: [
+      privateEndpoint
+    ]
+  }
