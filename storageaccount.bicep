@@ -6,7 +6,7 @@ var subnet1Name = 'firstSubnet'
 var privateEndpointName = 'myPrivateEndpoint'
 param myPrivateDNS string = 'privatelink.blob.core.windows.net'
 
-resource symbolicname 'Microsoft.Network/privateDnsZones@2024-06-01' = {
+resource myPrivateDNSZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
     location: 'global'
     name: myPrivateDNS
     properties: {}
@@ -53,6 +53,20 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-05-01' = {
     }
   }
 
+  resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+    parent: myPrivateDNSZone
+    name: '${myPrivateDNS}-link'
+    location: 'global'
+    properties: {
+      registrationEnabled: false
+      virtualNetwork: {
+        id: myVnet.id
+      }
+    }
+  }
+
+
+
 resource myStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     kind: 'BlobStorage'
     location: location
@@ -81,5 +95,4 @@ resource myBlobContainer 'Microsoft.Storage/storageAccounts/blobServices/contain
         publicAccess: 'None'
     }
 }
-
 
