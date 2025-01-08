@@ -81,5 +81,24 @@ resource privateDnsZoneVNetLink 'Microsoft.Network/privateDnsZones/virtualNetwor
         }
     }
 }
+
+
+var pvtEndpointDnsGroupName = '${redisPrivateEndpointName}/redisdnsgroup'
+resource pvtEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-05-01' = {
+  name: pvtEndpointDnsGroupName
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'dnsGroupConfig'
+        properties: {
+          privateDnsZoneId: privateDnsZone.id
+        }
+      }
+    ]
+  }
+  dependsOn: [
+    redisPrivateEndpoint
+  ]
+}
 output redisCacheHostName string = redisCache.properties.hostName
 output redisPrivateEndpointId string = redisPrivateEndpoint.id
