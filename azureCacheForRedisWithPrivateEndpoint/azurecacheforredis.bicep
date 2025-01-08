@@ -11,7 +11,12 @@ param location string = resourceGroup().location
   'Premium'
 ])
 param redisCacheSKU string = 'Standard'
-var redisPrivateEndpointName = 'myRedisPrivateEndpoint'
+var redisPrivateEndpointName = 'myredisprivateendpoint'
+var subnet1Name = 'firstSubnet'
+var virtualNetworkName = 'myVnet'
+
+
+
 resource redisCache 'Microsoft.Cache/redis@2024-11-01' = {
   name: redisCacheName
   location: location
@@ -26,14 +31,55 @@ resource redisCache 'Microsoft.Cache/redis@2024-11-01' = {
     }
   }
 }
+resource myVnet 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
+  name: virtualNetworkName
+}
 
-// resource redisPrivateEndpoint 'Microsoft.Cache/redis/privateEndpointConnections@2024-11-01' = {
-//   parent: redisCache
-//   name: redisPrivateEndpointName
-//   properties: {
-//     privateEndpoint: {}
-//     privateLinkServiceConnectionState: {
-//       status: 'Approved' 
-//     }
-//   }
-// }
+resource mySubnets 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' existing = {
+    parent: myVnet
+    name: subnet1Name
+
+}
+resource redisPrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-05-01' = {
+  name: redisPrivateEndpointName
+  location: location
+  properties: {
+    subnet: {
+      id: mySubnets.id
+    }
+    privateLinkServiceConnections: [
+      {
+        name: '${redisCacheName}-privateLink'
+        properties: {
+          privateLinkServiceConnectionState: {
+            status: 'Approved'
+            description: 'Private endpoint for Redis Cache'
+          }
+          privateLinkServiceId: redisCache.id
+          groupIds: [
+            'redisCache'
+          ]
+        }
+      }  
+    ]
+  }
+}
+
+var privateDnsZoneName = 'privatelink.redis.cache.windows.net'
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
+    name: privateDnsZoneName
+    location: 'global'
+}
+
+resource privateDnsZoneVNetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
+    name: '${privateDnsZone.name}/link'
+    location: 'global'
+    properties: {
+        registrationEnabled: false
+        virtualNetwork: {
+            id: myVnet.id
+        }
+    }
+}
+output redisCacheHostName string = redisCache.properties.hostName
+output redisPrivateEndpointId string = redisPrivateEndpoint.id
