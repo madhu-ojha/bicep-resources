@@ -10,7 +10,7 @@ param parLocation string = resourceGroup().location
 param parStorageAccountType string = 'Standard_LRS'
 
 
-param parHostingPlanName string
+param parSubnetResourceId string
 
 param parFunctionAppName string
 
@@ -25,6 +25,21 @@ resource storageAccountForFunction 'Microsoft.Storage/storageAccounts@2023-05-01
   properties: {
     supportsHttpsTrafficOnly: true
     defaultToOAuthAuthentication: true
+    publicNetworkAccess: 'Enabled'
+    allowBlobPublicAccess: false
+    networkAcls: {
+      resourceAccessRules: []
+      bypass: 'AzureServices'
+      virtualNetworkRules: [
+        {
+          id: parSubnetResourceId
+          action: 'Allow'
+          state: 'Succeeded'
+        }
+      ]
+      ipRules: []
+      defaultAction: 'Deny'
+    }
   }
 }
 
