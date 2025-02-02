@@ -13,6 +13,7 @@ param parStorageAccountType string = 'Standard_LRS'
 param parSubnetResourceId string
 
 param parFunctionAppName string
+param parApplicationInsightsName string
 
 //storage account needed for app function
 resource storageAccountForFunction 'Microsoft.Storage/storageAccounts@2023-05-01' = {
@@ -74,5 +75,14 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         maximumInstanceCount: 1
       }
     }
+  }
+}
+resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
+  name: parApplicationInsightsName
+  location: parLocation
+  kind: 'web'
+  properties: {
+    Application_Type: 'web'
+    Request_Source: 'rest'
   }
 }
