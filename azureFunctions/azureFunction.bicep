@@ -49,8 +49,8 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2024-04-01' = {
   name: parHostingPlanName
   location: parLocation
   sku: {
-    name: 'Y1'
-    tier: 'Dynamic'
+    name: 'FC1'
+    tier: 'FlexConsumption'
   }
   properties: {}
 }
