@@ -14,6 +14,7 @@ param parSubnetResourceId string
 
 param parFunctionAppName string
 param parApplicationInsightsName string
+param parHostingPlanName string
 
 //storage account needed for app function
 resource storageAccountForFunction 'Microsoft.Storage/storageAccounts@2023-05-01' = {
@@ -44,22 +45,22 @@ resource storageAccountForFunction 'Microsoft.Storage/storageAccounts@2023-05-01
   }
 }
 
-// resource hostingPlan 'Microsoft.Web/serverfarms@2024-04-01' = {
-//   name: parHostingPlanName
-//   location: parLocation
-//   sku: {
-//     name: 'Y1'
-//     tier: 'Dynamic'
-//   }
-//   properties: {}
-// }
+resource hostingPlan 'Microsoft.Web/serverfarms@2024-04-01' = {
+  name: parHostingPlanName
+  location: parLocation
+  sku: {
+    name: 'Y1'
+    tier: 'Dynamic'
+  }
+  properties: {}
+}
 
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name:  parFunctionAppName
   location: parLocation
   kind: 'functionapp'
   properties: {
-    // serverFarmId: hostingPlan.id
+    serverFarmId: hostingPlan.id
     functionAppConfig: {
       deployment: {
         storage: {
