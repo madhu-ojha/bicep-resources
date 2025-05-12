@@ -4,7 +4,8 @@ param parResourceGroupName string
 
 param parFluxConfigName string
 param parHttpsUser string
-param parProvider 'Azure' | 'Generic' | 'GitHub'
+param parProvider 'Azure' | 'Generic' | 'GitHub' = 'GitHub'
+param parFluxConfigScope 'cluster' | 'namespace' = 'cluster'
 
 param parBranchName string
 param parSourceUrl string
@@ -30,7 +31,7 @@ resource fluxConfiguration 'Microsoft.KubernetesConfiguration/fluxConfigurations
   name: parFluxConfigName
   scope: resAksCluster
   properties: {
-    scope: 'cluster'
+    scope: parFluxConfigScope
     gitRepository: {
       httpsUser: parHttpsUser
       provider: parProvider
