@@ -3,10 +3,10 @@ param parSubscriptionId string
 param parResourceGroupName string
 
 param parFluxConfigName string
-param parHttpsUser string
-param parProvider 'Azure' | 'Generic' | 'GitHub' = 'GitHub'
 param parFluxConfigScope 'cluster' | 'namespace' = 'cluster'
 
+param parGithubUser string
+param parGithubPat string
 param parBranchName string
 param parSourceUrl string
 param parGitRepoSyncInterval int
@@ -24,23 +24,26 @@ param parFluxNamespace string
 param parSourceKind 'AzureBlob' | 'Bucket' | 'GitRepository' | 'OCIRepository'
 resource resAksCluster 'Microsoft.ContainerService/managedClusters@2025-02-01' existing = {
   name: parAksClusterName
-  scope: resourceGroup(parSubscriptionId, parResourceGroupName)
+  // scope: resourceGroup(parSubscriptionId, parResourceGroupName)
 }
 
-resource fluxConfiguration 'Microsoft.KubernetesConfiguration/fluxConfigurations@2025-04-01' = {
+resource fluxConfiguration 'Microsoft.KubernetesConfiguration/fluxConfigurations@2024-11-01' = {
   name: parFluxConfigName
   scope: resAksCluster
   properties: {
     scope: parFluxConfigScope
     gitRepository: {
-      httpsUser: parHttpsUser
-      provider: parProvider
       repositoryRef: {
         branch: parBranchName
       }
+      localAuthRef: '${parFluxConfigName}-protected-parameters'
       syncIntervalInSeconds: parGitRepoSyncInterval
       timeoutInSeconds: parGitRepoTimeout
       url: parSourceUrl
+    }
+    configurationProtectedSettings: {
+      username: base64(parGithubUser)
+      password: base64(parGithubPat)
     }
     kustomizations: {
       kustomization: {
