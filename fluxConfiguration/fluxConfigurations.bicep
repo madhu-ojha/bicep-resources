@@ -1,3 +1,5 @@
+import * as typesSubstituteFrom from 'fluxConfiguration.types.bicep'
+
 param parAksClusterName string
 param parSubscriptionId string
 param parResourceGroupName string
@@ -19,6 +21,7 @@ param parKustomizationSyncInterval int
 param parKustomizationRetryInterval int
 param parKustomizationTimeout int
 param parKustomizationDependancies array 
+param parSubstituteFrom typesSubstituteFrom.substituteFrom
 
 param parFluxNamespace string
 param parSourceKind 'AzureBlob' | 'Bucket' | 'GitRepository' | 'OCIRepository'
@@ -54,6 +57,15 @@ resource fluxConfiguration 'Microsoft.KubernetesConfiguration/fluxConfigurations
         retryIntervalInSeconds: parKustomizationRetryInterval
         syncIntervalInSeconds: parKustomizationSyncInterval
         timeoutInSeconds: parKustomizationTimeout
+        postBuild: {
+          substituteFrom: [
+            {
+              kind: parSubstituteFrom.kind
+              name: parSubstituteFrom.name
+              optional: parSubstituteFrom.optional
+            }
+          ]
+        }
       }
     }
     namespace: parFluxNamespace
