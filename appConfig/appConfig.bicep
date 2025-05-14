@@ -19,9 +19,11 @@ resource resAppConfiguration 'Microsoft.AppConfiguration/configurationStores@202
     disableLocalAuth: parDisableLocalAuth
     publicNetworkAccess: parPublicNetworkAccess
     softDeleteRetentionInDays:parSoftDeleteRetentionDays
-
   }
   sku: {
     name: parSkuName
   }
 }
+
+output outAppConfigName string = resAppConfiguration.name
+output outAppConfigId string = resAppConfiguration.id
