@@ -1,4 +1,4 @@
-import * as typesSubstituteFrom from 'fluxConfiguration.types.bicep'
+import * as types from 'fluxConfiguration.types.bicep'
 
 param parAksClusterName string
 param parSubscriptionId string
@@ -14,14 +14,19 @@ param parSourceUrl string
 param parGitRepoSyncInterval int
 param parGitRepoTimeout int
 
-param parForceKustomization bool
-param parKustomizationPath string
-param parPruneKustomization bool
-param parKustomizationSyncInterval int
-param parKustomizationRetryInterval int
-param parKustomizationTimeout int
-param parKustomizationDependancies array 
-param parSubstituteFrom typesSubstituteFrom.substituteFrom
+// param parForceKustomization bool
+// param parKustomizationPath string
+// param parPruneKustomization bool
+// param parKustomizationSyncInterval int
+// param parKustomizationRetryInterval int
+// param parKustomizationTimeout int
+// param parKustomizationDependancies array 
+// param parSubstituteFrom types.substituteFrom
+param parKustomizationProps types.kustomizationProps
+
+param parKustomizations object = {
+  kustomization:  parKustomizationProps
+}
 
 param parFluxNamespace string
 param parSourceKind 'AzureBlob' | 'Bucket' | 'GitRepository' | 'OCIRepository'
@@ -48,26 +53,7 @@ resource fluxConfiguration 'Microsoft.KubernetesConfiguration/fluxConfigurations
       username: base64(parGithubUser)
       password: base64(parGithubPat)
     }
-    kustomizations: {
-      kustomization: {
-        dependsOn: parKustomizationDependancies
-        force: parForceKustomization
-        path: parKustomizationPath
-        prune: parPruneKustomization
-        retryIntervalInSeconds: parKustomizationRetryInterval
-        syncIntervalInSeconds: parKustomizationSyncInterval
-        timeoutInSeconds: parKustomizationTimeout
-        postBuild: {
-          substituteFrom: [
-            {
-              kind: parSubstituteFrom.kind
-              name: parSubstituteFrom.name
-              optional: parSubstituteFrom.optional
-            }
-          ]
-        }
-      }
-    }
+    kustomizations: parKustomizations
     namespace: parFluxNamespace
     sourceKind: parSourceKind    
   }
