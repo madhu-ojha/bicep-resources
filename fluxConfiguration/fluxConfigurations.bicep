@@ -1,8 +1,8 @@
 import * as types from 'fluxConfiguration.types.bicep'
 
 param parAksClusterName string
-param parSubscriptionId string
-param parResourceGroupName string
+// param parSubscriptionId string
+// param parResourceGroupName string
 
 param parFluxConfigName string
 param parFluxConfigScope 'cluster' | 'namespace' = 'cluster'
