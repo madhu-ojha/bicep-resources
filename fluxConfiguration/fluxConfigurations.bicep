@@ -14,18 +14,18 @@ param parSourceUrl string
 param parGitRepoSyncInterval int
 param parGitRepoTimeout int
 
-// param parForceKustomization bool
-// param parKustomizationPath string
-// param parPruneKustomization bool
-// param parKustomizationSyncInterval int
-// param parKustomizationRetryInterval int
-// param parKustomizationTimeout int
-// param parKustomizationDependancies array 
-// param parSubstituteFrom types.substituteFrom
+param parForceKustomization bool
+param parKustomizationPath string
+param parPruneKustomization bool
+param parKustomizationSyncInterval int
+param parKustomizationRetryInterval int
+param parKustomizationTimeout int
+param parKustomizationDependancies array
+param parSubstituteFrom types.substituteFrom
 param parKustomizationProps types.kustomizationProps
 
 param parKustomizations object = {
-  kustomization:  parKustomizationProps
+  kustomization: parKustomizationProps
 }
 
 param parFluxNamespace string
@@ -53,8 +53,27 @@ resource fluxConfiguration 'Microsoft.KubernetesConfiguration/fluxConfigurations
       username: base64(parGithubUser)
       password: base64(parGithubPat)
     }
-    kustomizations: parKustomizations
+    // kustomizations: parKustomizations
+    kustomizations: {
+      kustomization1: {
+        dependsOn: parKustomizationDependancies
+        force: parForceKustomization
+        path: parKustomizationPath
+        prune: parPruneKustomization
+        retryIntervalInSeconds: parKustomizationRetryInterval
+        syncIntervalInSeconds: parKustomizationSyncInterval
+        timeoutInSeconds: parKustomizationTimeout
+        postBuild: {
+          substituteFrom: [
+            {
+              kind: parSubstituteFrom.kind
+              name: parSubstituteFrom.name
+            }
+          ]
+        }
+      }
+    }
     namespace: parFluxNamespace
-    sourceKind: parSourceKind    
+    sourceKind: parSourceKind
   }
 }

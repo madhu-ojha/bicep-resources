@@ -2,23 +2,23 @@
 type substituteFrom = {
   kind: string
   name: string
-  optional: bool
+  optional: bool?
 }
 
 @export()
 type kustomizationProps = {
   dependsOn: array
-  force: bool
+  force: bool?
   path: string
-  prune: bool
-  retryIntervalInSeconds: int
-  syncIntervalInSeconds: int
-  timeoutInSeconds: int
+  prune: bool?
+  retryIntervalInSeconds: int?
+  syncIntervalInSeconds: int?
+  timeoutInSeconds: int?
   postBuild: {
     substituteFrom: {
       kind: string
       name: string
-      optional: bool
+      optional: bool?
     }[]
   }
 }
