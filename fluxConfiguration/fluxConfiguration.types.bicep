@@ -22,3 +22,8 @@ type kustomizationProps = {
     }[]
   }
 }
+
+@export()
+type kustomizations = {
+  *: kustomizationProps
+}

@@ -14,15 +14,15 @@ param parSourceUrl string
 param parGitRepoSyncInterval int
 param parGitRepoTimeout int
 
-param parForceKustomization bool
-param parKustomizationPath string
-param parPruneKustomization bool
-param parKustomizationSyncInterval int
-param parKustomizationRetryInterval int
-param parKustomizationTimeout int
-param parKustomizationDependancies array
-param parSubstituteFrom types.substituteFrom
-param parKustomizationProps types.kustomizationProps
+// param parForceKustomization bool
+// param parKustomizationPath string
+// param parPruneKustomization bool
+// param parKustomizationSyncInterval int
+// param parKustomizationRetryInterval int
+// param parKustomizationTimeout int
+// param parKustomizationDependancies array
+// param parSubstituteFrom types.substituteFrom
+param parKustomizationProps types.kustomizations
 
 param parKustomizations object = {
   kustomization: parKustomizationProps
@@ -53,26 +53,26 @@ resource fluxConfiguration 'Microsoft.KubernetesConfiguration/fluxConfigurations
       username: base64(parGithubUser)
       password: base64(parGithubPat)
     }
-    // kustomizations: parKustomizations
-    kustomizations: {
-      kustomization1: {
-        dependsOn: parKustomizationDependancies
-        force: parForceKustomization
-        path: parKustomizationPath
-        prune: parPruneKustomization
-        retryIntervalInSeconds: parKustomizationRetryInterval
-        syncIntervalInSeconds: parKustomizationSyncInterval
-        timeoutInSeconds: parKustomizationTimeout
-        postBuild: {
-          substituteFrom: [
-            {
-              kind: parSubstituteFrom.kind
-              name: parSubstituteFrom.name
-            }
-          ]
-        }
-      }
-    }
+    kustomizations: parKustomizations
+    // kustomizations: {
+    //   kustomization1: {
+    //     dependsOn: parKustomizationDependancies
+    //     force: parForceKustomization
+    //     path: parKustomizationPath
+    //     prune: parPruneKustomization
+    //     retryIntervalInSeconds: parKustomizationRetryInterval
+    //     syncIntervalInSeconds: parKustomizationSyncInterval
+    //     timeoutInSeconds: parKustomizationTimeout
+    //     postBuild: {
+    //       substituteFrom: [
+    //         {
+    //           kind: parSubstituteFrom.kind
+    //           name: parSubstituteFrom.name
+    //         }
+    //       ]
+    //     }
+    //   }
+    // }
     namespace: parFluxNamespace
     sourceKind: parSourceKind
   }
